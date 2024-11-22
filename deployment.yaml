@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back-ops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: back-ops
+  template:
+    metadata:
+      labels:
+        app: back-ops
+    spec:
+      containers:
+        - name: back-ops
+          image: 192.168.1.10:8443/back-ops
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:oracle:thin:@192.168.1.101:31521:xe
+            - name: SPRING_DATASOURCE_USERNAME
+              value: POP
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: POP
+          volumeMounts:
+            - name: upload
+              mountPath: /opt/upload
+      volumes:
+        - name: upload
+          nfs:
+            server: 192.168.1.10
+            path: /nfs_shared/spring/upload
